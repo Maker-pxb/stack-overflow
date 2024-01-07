@@ -1,8 +1,8 @@
 'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 import {
   Form,
   FormControl,
@@ -16,10 +16,14 @@ import { Input } from '@/components/ui/input'
 import * as z from 'zod'
 import { QuestionsSchema } from '@/lib/validations'
 import { Editor } from '@tinymce/tinymce-react'
-import { useRef } from 'react'
+import React, { useRef } from 'react'
+import { Badge } from '../shared/navbar/ui/badge'
+import { createQuestion } from '@/lib/actions/question.action'
 
+const type: any = 'create'
 const Question = () => {
   const editorRef = useRef(null)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
@@ -30,10 +34,51 @@ const Question = () => {
     }
   })
 
+  // eslint-disable-next-line no-undef
+  const handleInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    field: any
+  ) => {
+    if (e.key === 'Enter' && field.name === 'tags') {
+      e.preventDefault()
+      const targetInput = e.target as HTMLInputElement
+      const targetValue = targetInput.value.trim()
+
+      if (targetValue) {
+        if (field.value.length >= 15) {
+          return form.setError('tags', {
+            type: 'required',
+            message: 'Tag must be less than 15 characters.'
+          })
+        }
+        if (!field.value.includes(targetValue)) {
+          form.setValue('tags', [...field.value, targetValue])
+          targetInput.value = ''
+          form.clearErrors('tags')
+        } else {
+          form.trigger()
+        }
+      }
+    }
+  }
+
+  const handleTagRemove = (tag: string, field: any) => {
+    const filteredTags = field.value.filter((t: string) => t !== tag)
+    form.setValue('tags', filteredTags)
+  }
+
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+  async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    setIsSubmitting(true)
+    try {
+      console.log('🚀 ~ file: Question.tsx:72 ~ onSubmit ~ values:', values)
+      await createQuestion(values)
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false)
+    }
     console.log(values)
   }
   return (
@@ -80,6 +125,10 @@ const Question = () => {
                   onInit={(evt, editor) => {
                     // @ts-ignore
                     editorRef.current = editor
+                  }}
+                  onBlur={field.onBlur}
+                  onEditorChange={(content, editor) => {
+                    field.onChange(content)
                   }}
                   initialValue=""
                   init={{
@@ -130,11 +179,31 @@ const Question = () => {
                 Tags<span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl className="!mt-3.5">
-                <Input
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 mt-3.5 min-h-[56px] border"
-                  placeholder="Add tags..."
-                  {...field}
-                />
+                <>
+                  <Input
+                    className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 mt-3.5 min-h-[56px] border"
+                    placeholder="Add tags..."
+                    onKeyDown={(e) => handleInputKeyDown(e, field)}
+                  />
+                  <div className="flex-start mt-2.5 gap-2.5">
+                    {field.value.map((tag, index) => (
+                      <Badge
+                        key={index}
+                        className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
+                      >
+                        {tag}
+                        <Image
+                          src={'/assets/icons/close.svg'}
+                          alt="close"
+                          width={12}
+                          height={12}
+                          className="cursor-pointer object-contain invert-0 dark:invert"
+                          onClick={() => handleTagRemove(tag, field)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </>
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500 ">
                 Add up to 3 tags to describe what your question is about. You
@@ -144,7 +213,19 @@ const Question = () => {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button
+          className="primary-gradient w-fit !text-light-900"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>{type === 'edit' ? 'Updating...' : 'Submitting...'}</>
+          ) : type === 'edit' ? (
+            'Update Question'
+          ) : (
+            'Ask Question'
+          )}
+        </Button>
       </form>
     </Form>
   )
