@@ -36,7 +36,6 @@ const QuestionCard = ({
         <div>
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
             {getTimestamp(createdAt)}
-            {/* {String(createdAt)} */}
           </span>
           <Link href={`/question/${_id}`}>
             <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1">
@@ -55,7 +54,6 @@ const QuestionCard = ({
       </div>
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
-          // imgUrl={author.picture}
           imgUrl="/assets/icons/avatar.svg"
           alt="user"
           value={author.name}
