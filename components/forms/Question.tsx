@@ -82,9 +82,10 @@ const Question = ({ mongoUserId }: QuestionProps) => {
       console.log('🚀 ~ file: Question.tsx:72 ~ onSubmit ~ values:', values)
       await createQuestion({
         title: values.title,
-        explanation: values.explanation,
+        content: values.explanation,
         tags: values.tags,
-        author: JSON.parse(mongoUserId)
+        author: JSON.parse(mongoUserId),
+        path: pathname
       })
       router.push('/')
     } catch (error) {

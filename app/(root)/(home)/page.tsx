@@ -5,81 +5,14 @@ import NoResult from '@/components/shared/NoResult'
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar'
 import { Button } from '@/components/ui/button'
 import { HomePageFilters } from '@/constants/filters'
+import { getQuestions } from '@/lib/actions/question.action'
 import Link from 'next/link'
 
-const questions = [
-  {
-    _id: '1',
-    title: 'How to use Next.js with TypeScript?',
-    tags: [
-      {
-        _id: 1,
-        name: 'Next.js'
-      },
-      {
-        _id: 2,
-        name: 'TypeScript'
-      }
-    ],
-    author: {
-      _id: '1',
-      name: 'Maker',
-      picture: 'https://example.com/maker.jpg'
-    },
-    upvotes: 10000000,
-    views: 10,
-    answers: [{}, {}], // Fill with actual objects
-    createdAt: new Date('2021-09-01T00:00:00.000Z')
-  },
-  {
-    _id: '2',
-    title: 'How to use Next.js with TypeScript?',
-    tags: [
-      {
-        _id: '1',
-        name: 'Next.js'
-      },
-      {
-        _id: '2',
-        name: 'TypeScript'
-      }
-    ],
-    author: {
-      _id: '2',
-      name: 'pxb',
-      picture: 'https://example.com/pxb.jpg'
-    },
-    upvotes: 15,
-    views: 20,
-    answers: [{}, {}], // Fill with actual objects
-    createdAt: new Date('2023-09-01T00:00:00.000Z')
-  },
-  {
-    _id: '3',
-    title: 'How to use Next.js with TypeScript?',
-    tags: [
-      {
-        _id: '1',
-        name: 'Next.js'
-      },
-      {
-        _id: '2',
-        name: 'TypeScript'
-      }
-    ],
-    author: {
-      _id: '3',
-      name: 'pxb',
-      picture: 'https://example.com/pxb.jpg'
-    },
-    upvotes: 20,
-    views: 20,
-    answers: [{}, {}], // Fill with actual objects
-    createdAt: new Date('2023-09-01T00:00:00.000Z')
-  }
-]
+export default async function Home() {
+  const result = await getQuestions({})
+  const questions = result?.questions
+  console.log('🚀 ~ file: page.tsx:85 ~ Home ~ result:', questions)
 
-export default function Home() {
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">

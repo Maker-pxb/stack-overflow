@@ -46,7 +46,7 @@ const QuestionCard = ({
         {/* Todo edit */}
       </div>
       <div className="mt-3.5 flex flex-wrap gap-2">
-        {tags.map((tag) => (
+        {tags?.map((tag) => (
           <Link href={`/tag/${tag._id}`} key={tag._id}>
             <RenderTag _id={tag._id} name={tag.name}></RenderTag>
           </Link>
