@@ -8,11 +8,13 @@ export async function createQuestion(params: {
   title: string
   explanation: string
   tags: string[]
+  author: string
 }) {
+  console.log('🚀 ~ file: question.action.ts:8 ~ params:', params)
   const question = await Question.create({
     title: params.title,
-    explanation: params.explanation,
-    tags: params.tags
+    content: params.explanation,
+    author: params.author
   })
 
   const tagDocuments = []

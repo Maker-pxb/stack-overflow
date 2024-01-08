@@ -19,9 +19,15 @@ import { Editor } from '@tinymce/tinymce-react'
 import React, { useRef } from 'react'
 import { Badge } from '../shared/navbar/ui/badge'
 import { createQuestion } from '@/lib/actions/question.action'
-
+import { useRouter, usePathname } from 'next/navigation'
 const type: any = 'create'
-const Question = () => {
+interface QuestionProps {
+  mongoUserId: string
+}
+const Question = ({ mongoUserId }: QuestionProps) => {
+  const router = useRouter()
+  const pathname = usePathname()
+  console.log('🚀 ~ file: Question.tsx:17 ~ Question ~ pathname', pathname)
   const editorRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   // 1. Define your form.
@@ -74,8 +80,15 @@ const Question = () => {
     setIsSubmitting(true)
     try {
       console.log('🚀 ~ file: Question.tsx:72 ~ onSubmit ~ values:', values)
-      await createQuestion(values)
+      await createQuestion({
+        title: values.title,
+        explanation: values.explanation,
+        tags: values.tags,
+        author: JSON.parse(mongoUserId)
+      })
+      router.push('/')
     } catch (error) {
+      console.log('🚀 ~ file: Question.tsx:91 ~ onSubmit ~ error:', error)
     } finally {
       setIsSubmitting(false)
     }

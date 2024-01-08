@@ -2,7 +2,7 @@ import { Schema, models, model, Document } from 'mongoose'
 
 export interface IQuestion extends Document {
   title: string
-  explanation: string
+  content: string
   tags: Schema.Types.ObjectId[]
   views: number
   upvotes: Schema.Types.ObjectId[]
@@ -13,8 +13,8 @@ export interface IQuestion extends Document {
 }
 
 const QuestionSchema = new Schema({
-  title: { type: String, required: true, minlength: 5, maxlength: 130 },
-  explanation: { type: String, required: true, minlength: 100 },
+  title: { type: String, required: true },
+  content: { type: String, required: true },
   tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
   views: { type: Number, default: 0 },
   upvotes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
@@ -24,6 +24,6 @@ const QuestionSchema = new Schema({
   createdAt: { type: Date, default: Date.now }
 })
 
-const Question = models.Question || model<IQuestion>('Question', QuestionSchema)
+const Question = models.Question || model('Question', QuestionSchema)
 
 export default Question
