@@ -17,9 +17,9 @@ import * as z from 'zod'
 import { QuestionsSchema } from '@/lib/validations'
 import { Editor } from '@tinymce/tinymce-react'
 import React, { useRef } from 'react'
-import { Badge } from '../shared/navbar/ui/badge'
 import { createQuestion } from '@/lib/actions/question.action'
 import { useRouter, usePathname } from 'next/navigation'
+import { Badge } from '../ui/badge'
 const type: any = 'create'
 interface QuestionProps {
   mongoUserId: string
