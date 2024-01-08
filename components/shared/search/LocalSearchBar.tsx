@@ -1,7 +1,7 @@
 'use client'
+import { Input } from '@/components/ui/input'
 import Image from 'next/image'
 import React from 'react'
-import { Input } from '../navbar/ui/input'
 
 interface Props {
   route: string
