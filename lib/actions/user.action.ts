@@ -1,10 +1,11 @@
 'use server'
 
-import User from '@/database/user.model'
+import User, { IUser } from '@/database/user.model'
 import { connectToDatabase } from '../mongoose'
 import {
   CreateUserParams,
   DeleteUserParams,
+  GetAllUsersParams,
   UpdateUserParams
 } from './shared.types'
 import { revalidatePath } from 'next/cache'
@@ -84,6 +85,22 @@ export async function deleteUser(userParams: DeleteUserParams) {
 
     const deletedUser = await User.findByIdAndDelete(user._id)
     return deletedUser
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+export async function getAllUsers(params: GetAllUsersParams) {
+  // const { page = 1, pageSize = 20, filter, searchQuery } = params
+  try {
+    connectToDatabase()
+    const users = await User.find<
+      IUser & {
+        _id: string
+      }
+    >({}).sort({ createdAt: -1 })
+    return { users }
   } catch (error) {
     console.log(error)
     throw error
