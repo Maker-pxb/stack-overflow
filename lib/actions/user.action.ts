@@ -45,7 +45,7 @@ export async function updateUser(userParams: UpdateUserParams) {
   try {
     connectToDatabase()
     const { clerkId, updateData, path } = userParams
-    const newUser = await User.findByIdAndUpdate(
+    const newUser = await User.findOneAndUpdate(
       {
         clerkId
       },
@@ -54,8 +54,8 @@ export async function updateUser(userParams: UpdateUserParams) {
         new: true
       }
     )
+    console.log('🚀 ~ file: user.action.ts:57 ~ updateUser ~ newUser:', newUser)
     path && revalidatePath(path)
-    console.log('🚀 ~ file: user.action.ts:30 ~ createUser ~ newUser:', newUser)
     return newUser
   } catch (error) {
     console.log(error)

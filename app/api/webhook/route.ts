@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       name: `${firstName} ${lastName}`,
       email,
       picture,
-      username: username || email
+      username: username!
     })
 
     return NextResponse.json({
@@ -92,6 +92,15 @@ export async function POST(req: Request) {
       first_name: firstName,
       last_name: lastName
     } = evt.data
+    console.log(
+      'id, email, picture, username, firstName, lastName',
+      id,
+      email,
+      picture,
+      username,
+      firstName,
+      lastName
+    )
     // Create a ne user in your database
     const mongoUser = await updateUser({
       clerkId: id,
@@ -99,7 +108,7 @@ export async function POST(req: Request) {
         name: `${firstName} ${lastName}`,
         email,
         picture,
-        username: username || email
+        username: username!
       },
       path: `/profile/${id}`
     })
