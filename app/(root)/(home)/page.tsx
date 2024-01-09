@@ -11,7 +11,6 @@ import Link from 'next/link'
 export default async function Home() {
   const result = await getQuestions({})
   const questions = result?.questions
-  console.log('🚀 ~ file: page.tsx:85 ~ Home ~ result:', questions)
 
   return (
     <>
