@@ -27,7 +27,6 @@ interface QuestionProps {
 const Question = ({ mongoUserId }: QuestionProps) => {
   const router = useRouter()
   const pathname = usePathname()
-  console.log('🚀 ~ file: Question.tsx:17 ~ Question ~ pathname', pathname)
   const editorRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   // 1. Define your form.
@@ -79,7 +78,6 @@ const Question = ({ mongoUserId }: QuestionProps) => {
     // ✅ This will be type-safe and validated.
     setIsSubmitting(true)
     try {
-      console.log('🚀 ~ file: Question.tsx:72 ~ onSubmit ~ values:', values)
       await createQuestion({
         title: values.title,
         content: values.explanation,
@@ -93,7 +91,6 @@ const Question = ({ mongoUserId }: QuestionProps) => {
     } finally {
       setIsSubmitting(false)
     }
-    console.log(values)
   }
   return (
     <Form {...form}>

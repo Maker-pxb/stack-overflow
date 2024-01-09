@@ -24,8 +24,6 @@ export async function getQuestions(params: GetQuestionsParams) {
   }
 }
 export async function createQuestion(params: CreateQuestionParams) {
-  console.log('🚀 ~ file: question.action.ts:8 ~ params:', params)
-
   try {
     connectToDatabase()
     const question = await Question.create({

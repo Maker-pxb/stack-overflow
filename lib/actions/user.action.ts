@@ -12,14 +12,12 @@ import Question from '@/database/question.model'
 
 export async function getUserById(params: any) {
   try {
-    console.log('params', params)
     connectToDatabase()
     const { userId } = params
 
     const user = await User.findOne({
       clerkId: userId
     })
-    console.log('🚀 ~ file: user.action.ts:15 ~ getUserById ~ user:', user)
     return user
     // connect to database
   } catch (error) {
@@ -33,7 +31,6 @@ export async function createUser(userParams: CreateUserParams) {
     connectToDatabase()
     // const { clerkId, email, firstName, lastName, username, imageUrl:picture } = userParams
     const newUser = await User.create(userParams)
-    console.log('🚀 ~ file: user.action.ts:30 ~ createUser ~ newUser:', newUser)
     return newUser
   } catch (error) {
     console.log(error)
@@ -54,7 +51,6 @@ export async function updateUser(userParams: UpdateUserParams) {
         new: true
       }
     )
-    console.log('🚀 ~ file: user.action.ts:57 ~ updateUser ~ newUser:', newUser)
     path && revalidatePath(path)
     return newUser
   } catch (error) {
