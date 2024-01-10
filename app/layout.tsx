@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk as SpaceGrotesk } from 'next/font/google'
 import type { Metadata } from 'next'
 import './globals.css'
 import '../styles/prism.css'
+import '../lib/prism'
 import { ThemeProvider } from '@/context/ThemeProvider'
 
 const inter = Inter({
