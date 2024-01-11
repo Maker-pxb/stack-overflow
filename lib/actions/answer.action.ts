@@ -10,7 +10,7 @@ export const createAnswer = async (params: CreateAnswerParams) => {
   try {
     connectToDatabase()
     const { content, author, question, path } = params
-    const newAnswer = new Answer({
+    const newAnswer = await Answer.create({
       content,
       author,
       question
