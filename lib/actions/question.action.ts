@@ -7,7 +7,8 @@ import User from '@/database/user.model'
 import {
   CreateQuestionParams,
   GetQuestionByIdParams,
-  GetQuestionsParams
+  GetQuestionsParams,
+  QuestionVoteParams
 } from './shared.types'
 import { revalidatePath } from 'next/cache'
 
@@ -76,4 +77,67 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
     console.log(error)
     throw error
   }
+}
+
+export async function upvoteQuestion(params: QuestionVoteParams) {
+  console.log('upvoteQuestion', params)
+  try {
+    connectToDatabase()
+    const { questionId, userId, hasUpVoted, hasDownVoted, path } = params
+
+    let updateQuery = {}
+    if (hasUpVoted) {
+      updateQuery = { $pull: { upvotes: userId } }
+    } else if (hasDownVoted) {
+      updateQuery = {
+        $pull: { downvotes: userId },
+        $push: { upvotes: userId }
+      }
+    } else {
+      updateQuery = {
+        $addToSet: { upvotes: userId }
+      }
+    }
+    console.log('🚀 ~ upvoteQuestion ~ updateQuery:', updateQuery)
+    console.log('🚀 ~ upvoteQuestion ~ questionId:', questionId)
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true
+    })
+    console.log('🚀 ~ upvoteQuestion ~ question:', question)
+
+    if (!question) {
+      throw new Error('question not found')
+    }
+    revalidatePath(path)
+  } catch (error) {}
+}
+
+export async function downvoteQuestion(params: QuestionVoteParams) {
+  try {
+    connectToDatabase()
+    const { questionId, userId, hasUpVoted, hasDownVoted, path } = params
+
+    let updateQuery = {}
+    if (hasDownVoted) {
+      updateQuery = { $pull: { downvotes: userId } }
+    } else if (hasUpVoted) {
+      updateQuery = {
+        $pull: { upvotes: userId },
+        $push: { downvotes: userId }
+      }
+    } else {
+      updateQuery = {
+        $addToSet: { downvotes: userId }
+      }
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true
+    })
+
+    if (!question) {
+      throw new Error('question not found')
+    }
+    revalidatePath(path)
+  } catch (error) {}
 }
