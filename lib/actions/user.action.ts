@@ -7,12 +7,15 @@ import {
   DeleteUserParams,
   GetAllUsersParams,
   GetSavedQuestionsParams,
+  GetUserByIdParams,
+  GetUserStatsParams,
   ToggleSaveQuestionParams,
   UpdateUserParams
 } from './shared.types'
 import { revalidatePath } from 'next/cache'
 import Question from '@/database/question.model'
 import Tag from '@/database/tag.model'
+import Answer from '@/database/answer.model'
 
 export async function getUserById(params: any) {
   try {
@@ -201,4 +204,83 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       questions: savedQuestions
     }
   } catch (error) {}
+}
+
+export async function getUserInfo(params: GetUserByIdParams) {
+  try {
+    connectToDatabase()
+    const { userId } = params
+    const user = await User.findOne({ clerkId: userId })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    const totalQuestions = await Question.countDocuments({
+      author: user._id
+    })
+
+    const totalAnswers = await Answer.countDocuments({
+      author: user._id
+    })
+
+    return {
+      user,
+      totalQuestions,
+      totalAnswers
+    }
+  } catch (error) {
+    console.log('🚀 ~ getUserInfo ~ error:', error)
+    throw error
+  }
+}
+
+export async function getUserQuestions(params: GetUserStatsParams) {
+  // , searchQuery
+  const { userId, page = 1, pageSize = 10 } = params
+  try {
+    connectToDatabase()
+    const totalQuestions = await Question.countDocuments({
+      author: userId
+    })
+
+    const userQuestions = await Question.find({ author: userId })
+      .sort({ views: -1, upvotes: -1 })
+      .skip((page - 1) * pageSize)
+      .populate('tags', '_id name')
+      .populate('author', '_id clerkId name picture')
+
+    return {
+      questions: userQuestions,
+      totalQuestions
+    }
+  } catch (error) {
+    console.log('🚀 ~ getUserQuestions ~ error:', error)
+    throw error
+  }
+}
+
+export async function getUserAnswers(params: GetUserStatsParams) {
+  // , searchQuery
+  const { userId, page = 1, pageSize = 10 } = params
+  try {
+    connectToDatabase()
+    const totalAnswers = await Answer.countDocuments({
+      author: userId
+    })
+
+    const userAnswers = await Answer.find({ author: userId })
+      .sort({ upvotes: -1 })
+      .skip((page - 1) * pageSize)
+      .populate('question', '_id title')
+      .populate('author', '_id clerkId name picture')
+
+    return {
+      answers: userAnswers,
+      totalAnswers
+    }
+  } catch (error) {
+    console.log('🚀 ~ getUserQuestions ~ error:', error)
+    throw error
+  }
 }

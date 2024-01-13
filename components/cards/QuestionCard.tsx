@@ -5,6 +5,7 @@ import Metric from '../shared/Metric'
 import { formatAndDivideNumber, getTimestamp } from '@/lib/utils'
 export interface QuestionProps {
   _id: string | number
+  clerkId?: string | null
   title: string
   tags: {
     _id: string | number
