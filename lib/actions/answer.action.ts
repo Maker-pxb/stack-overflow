@@ -2,7 +2,11 @@
 
 import Answer from '@/database/answer.model'
 import { connectToDatabase } from '../mongoose'
-import { CreateAnswerParams, GetAnswersParams } from './shared.types'
+import {
+  AnswerVoteParams,
+  CreateAnswerParams,
+  GetAnswersParams
+} from './shared.types'
 import Question from '@/database/question.model'
 import { revalidatePath } from 'next/cache'
 
@@ -49,5 +53,68 @@ export const getAnswers = async (params: GetAnswersParams) => {
       })
       .sort({ createdAt: -1 })
     return { answers }
+  } catch (error) {}
+}
+
+export async function upvoteAnswer(params: AnswerVoteParams) {
+  console.log('upvoteQuestion', params)
+  try {
+    connectToDatabase()
+    const { answerId, userId, hasUpVoted, hasDownVoted, path } = params
+
+    let updateQuery = {}
+    if (hasUpVoted) {
+      updateQuery = { $pull: { upvotes: userId } }
+    } else if (hasDownVoted) {
+      updateQuery = {
+        $pull: { downvotes: userId },
+        $push: { upvotes: userId }
+      }
+    } else {
+      updateQuery = {
+        $addToSet: { upvotes: userId }
+      }
+    }
+    console.log('🚀 ~ upvoteQuestion ~ updateQuery:', updateQuery)
+    console.log('🚀 ~ upvoteQuestion ~ answerId:', answerId)
+    const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
+      new: true
+    })
+
+    if (!answer) {
+      throw new Error('answer not found')
+    }
+    revalidatePath(path)
+  } catch (error) {}
+}
+
+export async function downvoteAnswer(params: AnswerVoteParams) {
+  try {
+    connectToDatabase()
+    const { answerId, userId, hasUpVoted, hasDownVoted, path } = params
+
+    let updateQuery = {}
+    if (hasDownVoted) {
+      updateQuery = { $pull: { downvotes: userId } }
+    } else if (hasUpVoted) {
+      updateQuery = {
+        $pull: { upvotes: userId },
+        $push: { downvotes: userId }
+      }
+    } else {
+      updateQuery = {
+        $addToSet: { downvotes: userId }
+      }
+    }
+
+    console.log('🚀 ~ upvoteQuestion ~ answerId:', answerId)
+    const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
+      new: true
+    })
+
+    if (!answer) {
+      throw new Error('answer not found')
+    }
+    revalidatePath(path)
   } catch (error) {}
 }

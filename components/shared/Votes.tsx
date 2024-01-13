@@ -1,5 +1,7 @@
 'use client'
+import { downvoteAnswer, upvoteAnswer } from '@/lib/actions/answer.action'
 import { downvoteQuestion, upvoteQuestion } from '@/lib/actions/question.action'
+import { toggleSaveQuestion } from '@/lib/actions/user.action'
 import { formatAndDivideNumber } from '@/lib/utils'
 import { VoteActionType, VoteType } from '@/types/enum'
 import Image from 'next/image'
@@ -29,8 +31,6 @@ const Votes = ({
   const pathname = usePathname()
   const router = useRouter()
   console.log('🚀 ~ router:', router)
-  console.log('hasUpVoted', hasUpVoted)
-  console.log('hasDownVoted', hasDownVoted)
   const handleVote = async (action: VoteActionType) => {
     if (!userId) return
     const params = {
@@ -46,13 +46,13 @@ const Votes = ({
         await upvoteQuestion(params)
         console.log('upvote question')
       } else if (type === VoteType.ANSWER) {
-        // await upvoteAnswer({
-        //   questionId: JSON.parse(itemId),
-        //   userId: JSON.parse(userId),
-        //   hasUpVoted,
-        //   hasDownVoted,
-        //   path: pathname
-        // })
+        await upvoteAnswer({
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpVoted,
+          hasDownVoted,
+          path: pathname
+        })
       }
     }
     if (action === VoteActionType.DOWNVOTE) {
@@ -60,17 +60,23 @@ const Votes = ({
         await downvoteQuestion(params)
         console.log('upvote question')
       } else if (type === VoteType.ANSWER) {
-        // await downvoteAnswer({
-        //   questionId: JSON.parse(itemId),
-        //   userId: JSON.parse(userId),
-        //   hasUpVoted,
-        //   hasDownVoted,
-        //   path: pathname
-        // })
+        await downvoteAnswer({
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpVoted,
+          hasDownVoted,
+          path: pathname
+        })
       }
     }
   }
-  const handleSave = async () => {}
+  const handleSave = async () => {
+    toggleSaveQuestion({
+      questionId: JSON.parse(itemId),
+      userId: JSON.parse(userId),
+      path: pathname
+    })
+  }
   return (
     <div className="flex gap-5">
       <div className="flex-center gap-2.5">
@@ -113,18 +119,20 @@ const Votes = ({
           </div>
         </div>
       </div>
-      <Image
-        src={
-          hasSaved
-            ? '/assets/icons/star-filled.svg'
-            : '/assets/icons/star-red.svg'
-        }
-        width={18}
-        height={18}
-        alt="star"
-        className="cursor-pointer"
-        onClick={handleSave}
-      />
+      {type === VoteType.QUESTION && (
+        <Image
+          src={
+            hasSaved
+              ? '/assets/icons/star-filled.svg'
+              : '/assets/icons/star-red.svg'
+          }
+          width={18}
+          height={18}
+          alt="star"
+          className="cursor-pointer"
+          onClick={handleSave}
+        />
+      )}
     </div>
   )
 }
