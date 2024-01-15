@@ -4,6 +4,7 @@ import Metric from '../shared/Metric'
 import { formatAndDivideNumber, getTimestamp } from '@/lib/utils'
 import { SignedIn } from '@clerk/nextjs'
 import EditDeleteAction from '../shared/EditDeleteAction'
+import { VoteType } from '@/types/enum'
 
 interface Props {
   clerkId?: string | null
@@ -48,7 +49,10 @@ const AnswerCard = ({
         </div>
         <SignedIn>
           {showActionButtons && (
-            <EditDeleteAction type="Answer" itemId={JSON.stringify(_id)} />
+            <EditDeleteAction
+              type={VoteType.ANSWER}
+              itemId={JSON.stringify(_id)}
+            />
           )}
         </SignedIn>
       </div>

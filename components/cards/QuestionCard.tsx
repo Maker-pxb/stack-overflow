@@ -3,16 +3,20 @@ import React from 'react'
 import RenderTag from '../shared/RenderTag'
 import Metric from '../shared/Metric'
 import { formatAndDivideNumber, getTimestamp } from '@/lib/utils'
+import { SignedIn } from '@clerk/nextjs'
+import EditDeleteAction from '../shared/EditDeleteAction'
+import { VoteType } from '@/types/enum'
 export interface QuestionProps {
-  _id: string | number
-  clerkId?: string | null
+  _id: string
+  clerkId?: string
   title: string
   tags: {
-    _id: string | number
+    _id: string
     name: string
   }[]
   author: {
-    _id: string | number
+    _id: string
+    clerkId: string
     name: string
     picture: string
   }
@@ -23,6 +27,7 @@ export interface QuestionProps {
 }
 const QuestionCard = ({
   _id,
+  clerkId,
   title,
   tags,
   author,
@@ -31,6 +36,7 @@ const QuestionCard = ({
   answers,
   createdAt
 }: QuestionProps) => {
+  const showActionButtons = clerkId && clerkId === author?.clerkId
   return (
     <div className="card-wrapper rounded-[10px] p-9 sm:px-11 ">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
@@ -44,7 +50,16 @@ const QuestionCard = ({
             </h3>
           </Link>
         </div>
-        {/* Todo edit */}
+        <SignedIn>
+          <>
+            {showActionButtons && (
+              <EditDeleteAction
+                type={VoteType.QUESTION}
+                itemId={JSON.stringify(_id)}
+              />
+            )}
+          </>
+        </SignedIn>
       </div>
       <div className="mt-3.5 flex flex-wrap gap-2">
         {tags?.map((tag) => (

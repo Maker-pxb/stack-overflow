@@ -5,10 +5,12 @@ import { connectToDatabase } from '../mongoose'
 import {
   AnswerVoteParams,
   CreateAnswerParams,
+  DeleteAnswerParams,
   GetAnswersParams
 } from './shared.types'
 import Question from '@/database/question.model'
 import { revalidatePath } from 'next/cache'
+import Interaction from '@/database/interaction.model'
 
 export const createAnswer = async (params: CreateAnswerParams) => {
   try {
@@ -117,4 +119,31 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     }
     revalidatePath(path)
   } catch (error) {}
+}
+
+export async function deleteAnswer(params: DeleteAnswerParams) {
+  const { answerId, path } = params
+  try {
+    connectToDatabase()
+    const answer = await Answer.findById(answerId)
+    if (!answer) {
+      throw new Error('answer not found')
+    } else {
+      await answer.deleteOne({ _id: answerId })
+      await Question.updateMany(
+        {
+          _id: answer.question
+        },
+        {
+          $pull: { answers: answerId }
+        }
+      )
+      await Interaction.deleteMany({ answer: answerId })
+    }
+
+    revalidatePath(path)
+  } catch (error) {
+    console.log('🚀 ~ deleteQuestion ~ error:', error)
+    throw error
+  }
 }

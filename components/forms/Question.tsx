@@ -17,14 +17,24 @@ import * as z from 'zod'
 import { QuestionsSchema } from '@/lib/validations'
 import { Editor } from '@tinymce/tinymce-react'
 import React, { useRef } from 'react'
-import { createQuestion } from '@/lib/actions/question.action'
+import { createQuestion, editQuestion } from '@/lib/actions/question.action'
 import { useRouter, usePathname } from 'next/navigation'
 import { Badge } from '../ui/badge'
-const type: any = 'create'
+import { EditType, VoteType } from '@/types/enum'
 interface QuestionProps {
+  type?: EditType
   mongoUserId: string
+  questionDetails?: string
 }
-const Question = ({ mongoUserId }: QuestionProps) => {
+const Question = ({
+  mongoUserId,
+  type = EditType.CREATE,
+  questionDetails
+}: QuestionProps) => {
+  console.log('🚀 ~ questionDetails:', questionDetails)
+
+  const parsedQuestionDetails = questionDetails && JSON.parse(questionDetails)
+  const groupedTags = parsedQuestionDetails?.tags?.map((tag: any) => tag.name)
   const router = useRouter()
   const pathname = usePathname()
   const editorRef = useRef(null)
@@ -33,9 +43,9 @@ const Question = ({ mongoUserId }: QuestionProps) => {
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
     defaultValues: {
-      title: '',
-      explanation: '',
-      tags: []
+      title: parsedQuestionDetails?.title || '',
+      explanation: parsedQuestionDetails?.content || '',
+      tags: groupedTags || []
     }
   })
 
@@ -78,14 +88,24 @@ const Question = ({ mongoUserId }: QuestionProps) => {
     // ✅ This will be type-safe and validated.
     setIsSubmitting(true)
     try {
-      await createQuestion({
-        title: values.title,
-        content: values.explanation,
-        tags: values.tags,
-        author: JSON.parse(mongoUserId),
-        path: pathname
-      })
-      router.push('/')
+      if (type === EditType.EDIT) {
+        await editQuestion({
+          questionId: parsedQuestionDetails?._id,
+          title: values.title,
+          content: values.explanation,
+          path: pathname
+        })
+        router.push(`/question/${parsedQuestionDetails?._id}`)
+      } else if (type === EditType.CREATE) {
+        await createQuestion({
+          title: values.title,
+          content: values.explanation,
+          tags: values.tags,
+          author: JSON.parse(mongoUserId),
+          path: pathname
+        })
+        router.push('/')
+      }
     } catch (error) {
       console.log('🚀 ~ file: Question.tsx:91 ~ onSubmit ~ error:', error)
     } finally {
@@ -141,7 +161,7 @@ const Question = ({ mongoUserId }: QuestionProps) => {
                   onEditorChange={(content, editor) => {
                     field.onChange(content)
                   }}
-                  initialValue=""
+                  initialValue={parsedQuestionDetails?.content || ''}
                   init={{
                     height: 500,
                     menubar: false,
@@ -195,6 +215,7 @@ const Question = ({ mongoUserId }: QuestionProps) => {
                     className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 mt-3.5 min-h-[56px] border"
                     placeholder="Add tags..."
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
+                    disabled={type === EditType.EDIT}
                   />
                   <div className="flex-start mt-2.5 gap-2.5">
                     {field.value.map((tag, index) => (
@@ -203,14 +224,16 @@ const Question = ({ mongoUserId }: QuestionProps) => {
                         className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
                       >
                         {tag}
-                        <Image
-                          src={'/assets/icons/close.svg'}
-                          alt="close"
-                          width={12}
-                          height={12}
-                          className="cursor-pointer object-contain invert-0 dark:invert"
-                          onClick={() => handleTagRemove(tag, field)}
-                        />
+                        {type === EditType.CREATE && (
+                          <Image
+                            src={'/assets/icons/close.svg'}
+                            alt="close"
+                            width={12}
+                            height={12}
+                            className="cursor-pointer object-contain invert-0 dark:invert"
+                            onClick={() => handleTagRemove(tag, field)}
+                          />
+                        )}
                       </Badge>
                     ))}
                   </div>
@@ -230,8 +253,8 @@ const Question = ({ mongoUserId }: QuestionProps) => {
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <>{type === 'edit' ? 'Updating...' : 'Submitting...'}</>
-          ) : type === 'edit' ? (
+            <>{type === EditType.EDIT ? 'Updating...' : 'Submitting...'}</>
+          ) : type === EditType.EDIT ? (
             'Update Question'
           ) : (
             'Ask Question'
