@@ -55,18 +55,18 @@ const page = async ({ params: { id } }: URLProps) => {
                   title={getJoinedDate(user.joinAt)}
                 />
               )}
-              {user?.bio && (
-                <p className="paragraph-regular text-dark400_light800 mt-8">
-                  {user.bio}
-                </p>
-              )}
             </div>
+            {user?.bio && (
+              <p className="paragraph-regular text-dark400_light800 mt-8">
+                {user.bio}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex justify-end max-sm:mb-5 max-sm:w-full sm:mt-3">
           <SignedIn>
             {clerkId === user.clerkId && (
-              <Link href={`/profile/${user.clerkId}/edit`}>
+              <Link href={`/profile/edit`}>
                 <Button className="paragraph-medium btn-secondary text-dark300_light900 min-h-[46px] min-w-[175px] px-4 py-3">
                   Edit Profile
                 </Button>
@@ -102,9 +102,6 @@ const page = async ({ params: { id } }: URLProps) => {
           </TabsContent>
         </Tabs>
       </div>
-      {/* <div className="w-full max-w-[500px] break-words">
-        {JSON.stringify(user)}
-      </div> */}
     </>
   )
 }

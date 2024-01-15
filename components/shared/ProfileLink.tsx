@@ -12,7 +12,11 @@ const ProfileLink = ({ imgUrl, title, href }: ProfileLinkProps) => {
     <div className="flex-center gap-1">
       <Image src={imgUrl} alt="icon" width={20} height={20} />
       {href ? (
-        <Link href={href} className="paragraph-medium text-blue-500">
+        <Link
+          href={href}
+          target="_blank"
+          className="paragraph-medium text-blue-500"
+        >
           {title}
         </Link>
       ) : (

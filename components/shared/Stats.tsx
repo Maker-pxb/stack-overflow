@@ -36,21 +36,13 @@ const Stats = ({ totalQuestions, totalAnswers }: Props) => {
             <p className="paragraph-semibold text-dark200_light900">
               {formatAndDivideNumber(totalQuestions)}
             </p>
-            <p className="body-medium text-dark400_light700">
-              {/* <QuestionsTab
-                searchParams={searchParams}
-                userId={user._id}
-                clerkId={clerkId}
-              /> */}
-            </p>
+            <p className="body-medium text-dark400_light700">Questions</p>
           </div>
           <div>
             <p className="paragraph-semibold text-dark200_light900">
               {formatAndDivideNumber(totalAnswers)}
             </p>
-            <p className="body-medium text-dark400_light700">
-              <AnswerTab />
-            </p>
+            <p className="body-medium text-dark400_light700">Answers</p>
           </div>
         </div>
         <StatsCard
