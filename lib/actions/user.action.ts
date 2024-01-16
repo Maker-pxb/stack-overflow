@@ -16,6 +16,7 @@ import { revalidatePath } from 'next/cache'
 import Question from '@/database/question.model'
 import Tag from '@/database/tag.model'
 import Answer from '@/database/answer.model'
+import { QuestionFilterEnum, UserFiltersEnum } from '@/constants/filters'
 
 export async function getUserById(params: any) {
   try {
@@ -101,11 +102,27 @@ export async function getAllUsers(params: GetAllUsersParams) {
   const { page = 1, pageSize = 20, filter, searchQuery } = params
 
   const query: FilterQuery<typeof User> = {}
+
   if (searchQuery) {
     query.$or = [
       { name: { $regex: new RegExp(searchQuery, 'i') } },
       { username: { $regex: new RegExp(searchQuery, 'i') } }
     ]
+  }
+
+  let sortOptions = {}
+  switch (filter) {
+    case UserFiltersEnum.NEW_USERS:
+      sortOptions = { joinAt: -1 }
+      break
+    case UserFiltersEnum.TOP_CONTRIBUTORS:
+      sortOptions = { reputation: -1 }
+      break
+    case UserFiltersEnum.OLD_USERS:
+      sortOptions = { joinAt: 1 }
+      break
+    default:
+      break
   }
 
   try {
@@ -114,7 +131,7 @@ export async function getAllUsers(params: GetAllUsersParams) {
       IUser & {
         _id: string
       }
-    >(query).sort({ createdAt: -1 })
+    >(query).sort(sortOptions)
     return { users }
   } catch (error) {
     console.log(error)
@@ -169,8 +186,7 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
 export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     connectToDatabase()
-    // , filter
-    const { clerkId, page = 1, pageSize = 10, searchQuery } = params
+    const { clerkId, page = 1, pageSize = 10, searchQuery, filter } = params
 
     const query: FilterQuery<typeof Question> = searchQuery
       ? {
@@ -179,15 +195,45 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
           }
         }
       : {}
+
+    let sortOptions = {}
+    switch (filter) {
+      case QuestionFilterEnum.MOST_RECENT:
+        sortOptions = {
+          createdAt: -1
+        }
+        break
+      case QuestionFilterEnum.OLDEST:
+        sortOptions = {
+          createdAt: 1
+        }
+        break
+      case QuestionFilterEnum.MOST_ANSWERED:
+        sortOptions = {
+          answers: -1
+        }
+        break
+      case QuestionFilterEnum.MOST_VIEWED:
+        sortOptions = {
+          views: -1
+        }
+        break
+      case QuestionFilterEnum.MOST_VOTED:
+        sortOptions = {
+          upvotes: -1
+        }
+        break
+      default:
+        break
+    }
+
     const user = await User.findOne({
       clerkId
     }).populate({
       path: 'saved',
       match: query,
       options: {
-        sort: {
-          createdAt: -1
-        },
+        sort: sortOptions,
         limit: pageSize,
         skip: (page - 1) * pageSize
       },

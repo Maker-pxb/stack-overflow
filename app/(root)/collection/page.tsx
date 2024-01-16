@@ -17,7 +17,8 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
     clerkId: userId,
     page: 1,
     pageSize: 10,
-    searchQuery: searchParams?.q
+    searchQuery: searchParams?.q,
+    filter: searchParams?.filter
   })
   const questions = result?.questions
 
