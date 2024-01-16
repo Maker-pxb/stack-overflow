@@ -17,7 +17,7 @@ const page = async ({ params: { id: tagId }, searchParams }: URLProps) => {
       <h1 className="h1-bold text-dark100_light900">{tagTitle}</h1>
       <div className="mt-11 flex justify-between gap-4 max-sm:flex-col sm:items-center">
         <LocalSearchBar
-          route="/"
+          route={`/tags/${tagId}`}
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
           placeholder="Search for questions"

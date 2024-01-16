@@ -98,14 +98,23 @@ export async function deleteUser(userParams: DeleteUserParams) {
 }
 
 export async function getAllUsers(params: GetAllUsersParams) {
-  // const { page = 1, pageSize = 20, filter, searchQuery } = params
+  const { page = 1, pageSize = 20, filter, searchQuery } = params
+
+  const query: FilterQuery<typeof User> = {}
+  if (searchQuery) {
+    query.$or = [
+      { name: { $regex: new RegExp(searchQuery, 'i') } },
+      { username: { $regex: new RegExp(searchQuery, 'i') } }
+    ]
+  }
+
   try {
     connectToDatabase()
     const users = await User.find<
       IUser & {
         _id: string
       }
-    >({}).sort({ createdAt: -1 })
+    >(query).sort({ createdAt: -1 })
     return { users }
   } catch (error) {
     console.log(error)
@@ -236,7 +245,6 @@ export async function getUserInfo(params: GetUserByIdParams) {
 }
 
 export async function getUserQuestions(params: GetUserStatsParams) {
-  // , searchQuery
   const { userId, page = 1, pageSize = 10 } = params
   try {
     connectToDatabase()
@@ -261,7 +269,6 @@ export async function getUserQuestions(params: GetUserStatsParams) {
 }
 
 export async function getUserAnswers(params: GetUserStatsParams) {
-  // , searchQuery
   const { userId, page = 1, pageSize = 10 } = params
   try {
     connectToDatabase()

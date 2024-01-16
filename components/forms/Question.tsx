@@ -20,7 +20,7 @@ import React, { useRef } from 'react'
 import { createQuestion, editQuestion } from '@/lib/actions/question.action'
 import { useRouter, usePathname } from 'next/navigation'
 import { Badge } from '../ui/badge'
-import { EditType, VoteType } from '@/types/enum'
+import { EditType } from '@/types/enum'
 interface QuestionProps {
   type?: EditType
   mongoUserId: string
@@ -31,15 +31,12 @@ const Question = ({
   type = EditType.CREATE,
   questionDetails
 }: QuestionProps) => {
-  console.log('🚀 ~ questionDetails:', questionDetails)
-
   const parsedQuestionDetails = questionDetails && JSON.parse(questionDetails)
   const groupedTags = parsedQuestionDetails?.tags?.map((tag: any) => tag.name)
   const router = useRouter()
   const pathname = usePathname()
   const editorRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
     defaultValues: {
@@ -49,7 +46,6 @@ const Question = ({
     }
   })
 
-  // eslint-disable-next-line no-undef
   const handleInputKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     field: any
@@ -82,10 +78,7 @@ const Question = ({
     form.setValue('tags', filteredTags)
   }
 
-  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     setIsSubmitting(true)
     try {
       if (type === EditType.EDIT) {
