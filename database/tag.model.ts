@@ -5,7 +5,7 @@ export interface ITag extends Document {
   description: string
   questions: Schema.Types.ObjectId[]
   followers: Schema.Types.ObjectId[]
-  createdOn: Date
+  createdAt: Date
 }
 
 const TagSchema = new Schema({
@@ -13,7 +13,7 @@ const TagSchema = new Schema({
   description: { type: String },
   questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
   followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  createdOn: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now }
 })
 
 const Tag = models.Tag || model<ITag>('Tag', TagSchema)

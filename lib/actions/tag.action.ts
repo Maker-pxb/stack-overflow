@@ -10,7 +10,7 @@ import User from '@/database/user.model'
 import Tag, { ITag } from '@/database/tag.model'
 import { FilterQuery } from 'mongoose'
 import Question from '@/database/question.model'
-import Answer from '@/database/answer.model'
+import { TagFiltersEnum } from '@/constants/filters'
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   // const { page = 1, pageSize = 20, filter, searchQuery } = params
@@ -35,19 +35,46 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 }
 
 export async function getAllTags(params: GetAllTagsParams) {
+  const { page = 1, pageSize = 20, filter, searchQuery } = params
   try {
     connectToDatabase()
     const query: FilterQuery<typeof Tag> = {}
-    if (params.searchQuery) {
+    if (searchQuery) {
       query.$or = [
         {
           name: {
-            $regex: new RegExp(params.searchQuery, 'i')
+            $regex: new RegExp(searchQuery, 'i')
           }
         }
       ]
     }
-    const tags = await Tag.find(query)
+
+    let sortOptions = {}
+    switch (filter) {
+      case TagFiltersEnum.POPULAR:
+        sortOptions = {
+          questions: -1
+        }
+        break
+      case TagFiltersEnum.RECENT:
+        sortOptions = {
+          createdAt: -1
+        }
+        break
+      case TagFiltersEnum.NAME:
+        sortOptions = {
+          name: 1
+        }
+        break
+      case TagFiltersEnum.OLD:
+        sortOptions = {
+          createdAt: 1
+        }
+        break
+      default:
+        break
+    }
+    const tags = await Tag.find(query).sort(sortOptions)
     return { tags }
   } catch (error) {
     console.log(error)

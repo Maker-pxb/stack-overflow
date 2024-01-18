@@ -11,6 +11,7 @@ import {
 import Question from '@/database/question.model'
 import { revalidatePath } from 'next/cache'
 import Interaction from '@/database/interaction.model'
+import { AnswerFiltersEnum } from '@/constants/filters'
 
 export const createAnswer = async (params: CreateAnswerParams) => {
   try {
@@ -46,14 +47,39 @@ export const createAnswer = async (params: CreateAnswerParams) => {
 export const getAnswers = async (params: GetAnswersParams) => {
   try {
     connectToDatabase()
-    const { questionId } = params
+    const { questionId, sortBy } = params
+    let sortOptions = {}
+    switch (sortBy) {
+      case AnswerFiltersEnum.HIGHEST_UPVOTES:
+        sortOptions = {
+          upvotes: -1
+        }
+        break
+      case AnswerFiltersEnum.LOWEST_UPVOTES:
+        sortOptions = {
+          upvotes: 1
+        }
+        break
+      case AnswerFiltersEnum.RECENT:
+        sortOptions = {
+          createdAt: -1
+        }
+        break
+      case AnswerFiltersEnum.OLD:
+        sortOptions = {
+          createdAt: 1
+        }
+        break
+      default:
+        break
+    }
     const answers = await Answer.find({ question: questionId })
       .populate({
         path: 'author',
         model: 'User',
         select: '_id, clerkId, name picture'
       })
-      .sort({ createdAt: -1 })
+      .sort(sortOptions)
     return { answers }
   } catch (error) {}
 }
