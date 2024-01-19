@@ -47,8 +47,9 @@ export const createAnswer = async (params: CreateAnswerParams) => {
 export const getAnswers = async (params: GetAnswersParams) => {
   try {
     connectToDatabase()
-    const { questionId, sortBy } = params
+    const { questionId, sortBy, page = 1, pageSize = 10 } = params
     let sortOptions = {}
+    const skipAmount = (page - 1) * pageSize
     switch (sortBy) {
       case AnswerFiltersEnum.HIGHEST_UPVOTES:
         sortOptions = {
@@ -80,7 +81,11 @@ export const getAnswers = async (params: GetAnswersParams) => {
         select: '_id, clerkId, name picture'
       })
       .sort(sortOptions)
-    return { answers }
+      .skip(skipAmount)
+      .limit(pageSize)
+    const totalAnswers = await Answer.countDocuments({ question: questionId })
+    const isNext = totalAnswers > skipAmount + answers.length
+    return { answers, total: totalAnswers, isNext, pageSize, page }
   } catch (error) {}
 }
 

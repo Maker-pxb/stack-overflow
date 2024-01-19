@@ -35,9 +35,10 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 }
 
 export async function getAllTags(params: GetAllTagsParams) {
-  const { page = 1, pageSize = 20, filter, searchQuery } = params
+  const { page = 1, pageSize = 10, filter, searchQuery } = params
   try {
     connectToDatabase()
+    const skipAmount = (page - 1) * pageSize
     const query: FilterQuery<typeof Tag> = {}
     if (searchQuery) {
       query.$or = [
@@ -74,8 +75,14 @@ export async function getAllTags(params: GetAllTagsParams) {
       default:
         break
     }
-    const tags = await Tag.find(query).sort(sortOptions)
-    return { tags }
+    const tags = await Tag.find(query)
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(pageSize)
+
+    const total = await Tag.countDocuments(query)
+    const isNext = total > skipAmount + tags.length
+    return { tags, isNext, total, pageSize, page }
   } catch (error) {
     console.log(error)
     throw error
@@ -90,6 +97,7 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
     const tagFilter: FilterQuery<ITag> = {
       _id: tagId
     }
+    const skipAmount = (page - 1) * pageSize
     const tag = await Tag.findOne(tagFilter).populate({
       path: 'questions',
       model: Question,
@@ -105,8 +113,8 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
         sort: {
           createdAt: -1
         },
-        limit: pageSize,
-        skip: (page - 1) * pageSize
+        skip: skipAmount,
+        limit: pageSize
       },
       populate: [
         {
@@ -125,9 +133,17 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
     if (!tag) {
       throw new Error('Tag not found')
     }
+    const total = await Question.countDocuments({
+      tags: tagId,
+      title: {
+        $regex: searchQuery,
+        $options: 'i'
+      }
+    })
+    const isNext = total > skipAmount + pageSize
     const questions = tag.questions
 
-    return { tagTitle: tag.name, questions }
+    return { tagTitle: tag.name, questions, isNext, total, pageSize, page }
   } catch (error) {
     console.log(error)
     throw error

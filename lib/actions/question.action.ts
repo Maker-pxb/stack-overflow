@@ -23,6 +23,9 @@ export async function getQuestions(params: GetQuestionsParams) {
     connectToDatabase()
     console.log(params)
     const { page = 1, pageSize = 10, searchQuery = '', filter = '' } = params
+    console.log('🚀 ~ getQuestions ~ pageSize:', pageSize)
+
+    const skipAmount = (page - 1) * pageSize
     const query: FilterQuery<typeof Question> = {}
     if (searchQuery) {
       query.$or = [
@@ -51,9 +54,20 @@ export async function getQuestions(params: GetQuestionsParams) {
     const questions = await Question.find(query)
       .populate({ path: 'tags', model: Tag })
       .populate({ path: 'author', model: User })
+      .skip(skipAmount)
+      .limit(pageSize)
       .sort(sortOptions)
+    const totalQuestions = await Question.countDocuments(query)
+    const isNext = totalQuestions > skipAmount + questions.length
+    console.log('🚀 ~ getQuestions ~ totalQuestions:', totalQuestions)
+    console.log('🚀 ~ getQuestions ~ questions.length:', questions.length)
+    console.log('🚀 ~ getQuestions ~ skipAmount:', skipAmount)
+    console.log(
+      '🚀 ~ getQuestions ~ skipAmount + questions.length:',
+      skipAmount + questions.length
+    )
 
-    return { questions }
+    return { questions, isNext, total: totalQuestions, page, pageSize }
   } catch (error) {
     console.log(error)
     throw error

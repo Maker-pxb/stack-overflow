@@ -8,6 +8,7 @@ import { getTimestamp } from '@/lib/utils'
 import ParseHTML from './ParseHTML'
 import Votes from './Votes'
 import { VoteType } from '@/types/enum'
+import Pagination from './Pagination'
 interface Props {
   questionId: string
   userId: string
@@ -25,7 +26,7 @@ const AllAnswers = async ({
   const result = await getAnswers({
     questionId,
     page,
-    sortBy: filter
+    sortBy: filter,
   })
 
   return (
@@ -79,6 +80,14 @@ const AllAnswers = async ({
             <ParseHTML data={answer.content} />
           </article>
         ))}
+      </div>
+      <div className="mt-10">
+        <Pagination
+          pageNumber={page}
+          isNext={result?.isNext || false}
+          total={result?.total}
+          pageSize={result?.pageSize}
+        />
       </div>
     </div>
   )

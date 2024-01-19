@@ -12,7 +12,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-const page = async ({ params: { id } }: URLProps) => {
+const page = async ({ params: { id }, searchParams }: URLProps) => {
   const { userId: clerkId } = auth()
   console.log('🚀 ~ page ~ clerkId:', clerkId)
   const { user, totalAnswers, totalQuestions } = await getUserInfo({
@@ -88,14 +88,14 @@ const page = async ({ params: { id } }: URLProps) => {
           </TabsList>
           <TabsContent value="top-posts">
             <QuestionsTab
-              searchParams={{ userId: user.clerkId }}
+              searchParams={searchParams}
               userId={user._id}
               clerkId={clerkId}
             />
           </TabsContent>
           <TabsContent value="answers" className="flex w-full flex-col gap-6">
             <AnswerTab
-              searchParams={{ userId: user.clerkId }}
+              searchParams={searchParams}
               userId={user._id}
               clerkId={clerkId}
             />
