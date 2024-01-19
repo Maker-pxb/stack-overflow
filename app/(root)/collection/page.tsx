@@ -17,7 +17,7 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
   const result = await getSavedQuestions({
     clerkId: userId,
     page: searchParams?.page ? Number(searchParams?.page) : 1,
-    pageSize: 2,
+    pageSize: 10,
     searchQuery: searchParams?.q,
     filter: searchParams?.filter
   })
@@ -28,7 +28,7 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
       <h1 className="h1-bold text-dark100_light900">Saved Question</h1>
       <div className="mt-11 flex justify-between gap-4 max-sm:flex-col sm:items-center">
         <LocalSearchBar
-          route="/"
+          route="/collection"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
           placeholder="Search for questions"

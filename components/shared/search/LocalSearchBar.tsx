@@ -38,15 +38,17 @@ const LocalSearchBar = ({
         })
         router.push(`${newUrl}`, { scroll: false })
       } else {
-        const newUrl = removeKeysFromQuery({
-          params: searchParams.toString(),
-          keysToRemove: ['q']
-        })
-        router.push(newUrl, { scroll: false })
+        if (pathname === route) {
+          const newUrl = removeKeysFromQuery({
+            params: searchParams.toString(),
+            keysToRemove: ['q']
+          })
+          router.push(newUrl, { scroll: false })
+        }
       }
       return () => clearTimeout(delayDebounceFn)
     }, 300)
-  }, [search, router, pathname, searchParams, query])
+  }, [search, router, route, pathname, searchParams, query])
 
   return (
     <div
@@ -64,7 +66,7 @@ const LocalSearchBar = ({
       <Input
         type="text"
         placeholder={placeholder}
-        className="paragraph-regular no-focus placeholder background-light800_darkgradient border-none shadow-none outline-none"
+        className="paragraph-regular no-focus placeholder background-light800_darkgradient text-dark400_light700 border-none shadow-none outline-none"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
