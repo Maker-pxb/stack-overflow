@@ -24,9 +24,9 @@ const AllAnswers = async ({
   filter
 }: Props) => {
   const result = await getAnswers({
-    questionId,
+    questionId: JSON.parse(questionId),
     page,
-    sortBy: filter,
+    sortBy: filter
   })
 
   return (
@@ -68,11 +68,13 @@ const AllAnswers = async ({
                   <Votes
                     type={VoteType.ANSWER}
                     itemId={JSON.stringify(answer._id)}
-                    userId={JSON.stringify(userId)}
+                    userId={userId}
                     upvotes={answer.upvotes?.length}
-                    hasUpVoted={answer.upvotes?.includes(userId)}
+                    hasUpVoted={answer.upvotes?.includes(JSON.parse(userId))}
                     downvotes={answer.downvotes?.length}
-                    hasDownVoted={answer.downvotes?.includes(userId)}
+                    hasDownVoted={answer.downvotes?.includes(
+                      JSON.parse(userId)
+                    )}
                   />
                 </div>
               </div>

@@ -14,7 +14,10 @@ import {
 } from './shared.types'
 import { revalidatePath } from 'next/cache'
 import Answer from '@/database/answer.model'
-import Interaction from '@/database/interaction.model'
+import Interaction, {
+  ActionScore,
+  ReputationAction
+} from '@/database/interaction.model'
 import { FilterQuery } from 'mongoose'
 import { HomeFilterEnum } from '@/constants/filters'
 
@@ -92,8 +95,22 @@ export async function createQuestion(params: CreateQuestionParams) {
         }
       }
     })
+
+    await Interaction.create({
+      user: params.author,
+      action: ReputationAction.ASK_QUESTION,
+      question: question._id,
+      tags: tagDocuments
+    })
+
+    await User.findByIdAndUpdate(params.author, {
+      $inc: { reputation: ActionScore.ASK_QUESTION }
+    })
     params.path && revalidatePath(params.path)
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
 }
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
@@ -138,6 +155,22 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     if (!question) {
       throw new Error('question not found')
     }
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: {
+        reputation: hasUpVoted
+          ? ActionScore.DOWNVOTE_QUESTION_FOR_USER
+          : ActionScore.UPVOTE_QUESTION_FOR_USER
+      }
+    })
+
+    await User.findByIdAndUpdate(question.author, {
+      $inc: {
+        reputation: hasUpVoted
+          ? ActionScore.DOWNVOTE_QUESTION_FOR_AUTHOR
+          : ActionScore.UPVOTE_QUESTION_FOR_AUTHOR
+      }
+    })
     revalidatePath(path)
   } catch (error) {}
 }
@@ -163,6 +196,22 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
 
     const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
       new: true
+    })
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: {
+        reputation: hasDownVoted
+          ? ActionScore.UPVOTE_QUESTION_FOR_USER
+          : ActionScore.DOWNVOTE_QUESTION_FOR_USER
+      }
+    })
+
+    await User.findByIdAndUpdate(question.author, {
+      $inc: {
+        reputation: hasDownVoted
+          ? ActionScore.UPVOTE_QUESTION_FOR_AUTHOR
+          : ActionScore.DOWNVOTE_QUESTION_FOR_AUTHOR
+      }
     })
 
     if (!question) {

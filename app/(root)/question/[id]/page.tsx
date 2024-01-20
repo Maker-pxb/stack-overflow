@@ -100,8 +100,8 @@ const page = async ({
         ))}
       </div>
       <AllAnswers
-        questionId={result._id}
-        userId={mongoUser._id}
+        questionId={JSON.stringify(result._id)}
+        userId={JSON.stringify(mongoUser._id)}
         totalAnswers={result.answers?.length}
         page={Number(searchParams?.page || 1)}
         filter={searchParams?.filter}

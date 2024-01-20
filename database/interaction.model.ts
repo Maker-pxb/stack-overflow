@@ -9,6 +9,25 @@ export interface IInteraction extends Document {
   createdAt: Date
 }
 
+export enum ReputationAction {
+  ASK_QUESTION = 'ask_question',
+  ANSWER = 'answer',
+  VIEW = 'view'
+}
+
+export enum ActionScore {
+  ASK_QUESTION = 5,
+  UPVOTE_QUESTION_FOR_USER = 1,
+  DOWNVOTE_QUESTION_FOR_USER = -1,
+  UPVOTE_QUESTION_FOR_AUTHOR = 10,
+  DOWNVOTE_QUESTION_FOR_AUTHOR = -10,
+  ANSWER = 10,
+  UPVOTE_ANSWER_FOR_USER = 1,
+  DOWNVOTE_ANSWER_FOR_USER = -1,
+  UPVOTE_ANSWER_FOR_AUTHOR = 10,
+  DOWNVOTE_ANSWER_FOR_AUTHOR = -10
+}
+
 const InteractionSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   action: { type: String, required: true },

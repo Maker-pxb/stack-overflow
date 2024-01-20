@@ -10,8 +10,12 @@ import {
 } from './shared.types'
 import Question from '@/database/question.model'
 import { revalidatePath } from 'next/cache'
-import Interaction from '@/database/interaction.model'
+import Interaction, {
+  ActionScore,
+  ReputationAction
+} from '@/database/interaction.model'
 import { AnswerFiltersEnum } from '@/constants/filters'
+import User from '@/database/user.model'
 
 export const createAnswer = async (params: CreateAnswerParams) => {
   try {
@@ -25,6 +29,18 @@ export const createAnswer = async (params: CreateAnswerParams) => {
     // 添加 answer 至 question
     const questionObj = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id }
+    })
+
+    await Interaction.create({
+      user: author,
+      action: ReputationAction.ANSWER,
+      question,
+      answer: newAnswer._id,
+      tags: questionObj.tags
+    })
+
+    await User.findByIdAndUpdate(author, {
+      $inc: { reputation: ActionScore.ANSWER }
     })
 
     revalidatePath(path)
@@ -106,6 +122,23 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
     if (!answer) {
       throw new Error('answer not found')
     }
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: {
+        reputation: hasUpVoted
+          ? ActionScore.DOWNVOTE_ANSWER_FOR_USER
+          : ActionScore.UPVOTE_ANSWER_FOR_USER
+      }
+    })
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: {
+        reputation: hasUpVoted
+          ? ActionScore.DOWNVOTE_ANSWER_FOR_AUTHOR
+          : ActionScore.UPVOTE_ANSWER_FOR_AUTHOR
+      }
+    })
+
     revalidatePath(path)
   } catch (error) {}
 }
@@ -131,6 +164,22 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
 
     const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
       new: true
+    })
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: {
+        reputation: hasDownVoted
+          ? ActionScore.UPVOTE_ANSWER_FOR_USER
+          : ActionScore.DOWNVOTE_ANSWER_FOR_USER
+      }
+    })
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: {
+        reputation: hasDownVoted
+          ? ActionScore.UPVOTE_ANSWER_FOR_AUTHOR
+          : ActionScore.DOWNVOTE_ANSWER_FOR_AUTHOR
+      }
     })
 
     if (!answer) {
