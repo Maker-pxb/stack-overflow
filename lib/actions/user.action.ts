@@ -339,7 +339,6 @@ export async function getUserAnswers(params: GetUserStatsParams) {
       author: userId
     })
     const skipAmount = (page - 1) * pageSize
-    console.log('🚀 ~ getUserAnswers ~ pageSize:', pageSize)
     const userAnswers = await Answer.find({ author: userId })
       .sort({ upvotes: -1 })
       .skip(skipAmount)

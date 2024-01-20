@@ -31,7 +31,6 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   const editorRef = React.useRef<any>(null)
 
   const handleCreateAnswer = async (data: z.infer<typeof AnswersSchema>) => {
-    console.log(data)
     setIsSubmitting(true)
     try {
       await createAnswer({

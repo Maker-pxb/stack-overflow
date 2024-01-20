@@ -9,8 +9,6 @@ interface Props extends SearchParamsProps {
   clerkId: string | null
 }
 const QuestionsTab = async ({ searchParams, userId, clerkId }: Props) => {
-  console.log('🚀 ~ QuestionsTab ~ searchParams?.page:', searchParams?.page)
-
   const result = await getUserQuestions({
     userId,
     page: searchParams?.page ? Number(searchParams?.page) : 1,

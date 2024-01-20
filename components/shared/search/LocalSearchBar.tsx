@@ -30,7 +30,6 @@ const LocalSearchBar = ({
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (search) {
-        console.log('🚀 ~ delayDebounceFn ~ search:', search)
         const newUrl = formUrlQuery({
           params: searchParams.toString(),
           key: 'q',

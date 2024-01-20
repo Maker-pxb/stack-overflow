@@ -1,11 +1,13 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { formUrlQuery, removeKeysFromQuery } from '@/lib/utils'
+import GlobalSearchResult from './GlobalSearchResult'
 
 const GlobalSearch = () => {
+  const searchContainerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -15,9 +17,22 @@ const GlobalSearch = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
+    const handleOutsideClick = (e: any) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(e.target)
+      ) {
+        setSearch('')
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('click', handleOutsideClick)
+    return () => document.removeEventListener('click', handleOutsideClick)
+  }, [])
+
+  useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (search) {
-        console.log('🚀 ~ delayDebounceFn ~ search:', search)
         const newUrl = formUrlQuery({
           params: searchParams.toString(),
           key: 'global',
@@ -25,17 +40,22 @@ const GlobalSearch = () => {
         })
         router.push(`${newUrl}`, { scroll: false })
       } else {
-        const newUrl = removeKeysFromQuery({
-          params: searchParams.toString(),
-          keysToRemove: ['global']
-        })
-        router.push(newUrl, { scroll: false })
+        if (query) {
+          const newUrl = removeKeysFromQuery({
+            params: searchParams.toString(),
+            keysToRemove: ['global', 'type']
+          })
+          router.push(newUrl, { scroll: false })
+        }
       }
       return () => clearTimeout(delayDebounceFn)
     }, 300)
   }, [search, router, pathname, searchParams, query])
   return (
-    <div className="relative w-full max-w-[600px] max-lg:hidden">
+    <div
+      className="relative w-full max-w-[600px] max-lg:hidden"
+      ref={searchContainerRef}
+    >
       <div className="background-light800_darkgradient relative flex min-h-[56px] grow items-center gap-1 rounded-xl px-4">
         <Image
           src={'/assets/icons/search.svg'}
@@ -60,6 +80,7 @@ const GlobalSearch = () => {
           }}
         />
       </div>
+      {isOpen && <GlobalSearchResult />}
     </div>
   )
 }

@@ -21,10 +21,7 @@ import { HomeFilterEnum } from '@/constants/filters'
 export async function getQuestions(params: GetQuestionsParams) {
   try {
     connectToDatabase()
-    console.log(params)
     const { page = 1, pageSize = 10, searchQuery = '', filter = '' } = params
-    console.log('🚀 ~ getQuestions ~ pageSize:', pageSize)
-
     const skipAmount = (page - 1) * pageSize
     const query: FilterQuery<typeof Question> = {}
     if (searchQuery) {
@@ -59,14 +56,6 @@ export async function getQuestions(params: GetQuestionsParams) {
       .sort(sortOptions)
     const totalQuestions = await Question.countDocuments(query)
     const isNext = totalQuestions > skipAmount + questions.length
-    console.log('🚀 ~ getQuestions ~ totalQuestions:', totalQuestions)
-    console.log('🚀 ~ getQuestions ~ questions.length:', questions.length)
-    console.log('🚀 ~ getQuestions ~ skipAmount:', skipAmount)
-    console.log(
-      '🚀 ~ getQuestions ~ skipAmount + questions.length:',
-      skipAmount + questions.length
-    )
-
     return { questions, isNext, total: totalQuestions, page, pageSize }
   } catch (error) {
     console.log(error)
@@ -125,7 +114,6 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
 }
 
 export async function upvoteQuestion(params: QuestionVoteParams) {
-  console.log('upvoteQuestion', params)
   try {
     connectToDatabase()
     const { questionId, userId, hasUpVoted, hasDownVoted, path } = params
@@ -143,12 +131,9 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
         $addToSet: { upvotes: userId }
       }
     }
-    console.log('🚀 ~ upvoteQuestion ~ updateQuery:', updateQuery)
-    console.log('🚀 ~ upvoteQuestion ~ questionId:', questionId)
     const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
       new: true
     })
-    console.log('🚀 ~ upvoteQuestion ~ question:', question)
 
     if (!question) {
       throw new Error('question not found')

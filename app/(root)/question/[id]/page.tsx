@@ -50,7 +50,7 @@ const page = async ({
               className="rounded-full"
             />
             <p className="paragraph-semibold text-dark300_light700">
-              {author.name}
+              {author?.name}
             </p>
           </Link>
           <div className="flex justify-end">

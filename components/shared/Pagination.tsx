@@ -18,13 +18,9 @@ const Pagination = ({
   total = 0,
   scroll = true
 }: Props) => {
-  console.log('🚀 ~ isNext:', isNext)
-  console.log('🚀 ~ pageSize:', pageSize)
-  console.log('🚀 ~ total:', total)
   const router = useRouter()
   const searchParams = useSearchParams()
   const pageCount = Math.ceil(total / pageSize) || 0
-  console.log('🚀 ~ pageCount:', pageCount)
   const handleNavigation = (direction: string, page?: number) => {
     let nextPage
     if (direction === 'page') {

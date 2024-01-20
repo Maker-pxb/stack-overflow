@@ -26,17 +26,9 @@ export const createAnswer = async (params: CreateAnswerParams) => {
     const questionObj = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id }
     })
-    console.log(
-      '🚀 ~ file: answer.action.ts:22 ~ createAnswer ~ questionObj:',
-      questionObj
-    )
 
     revalidatePath(path)
 
-    console.log(
-      '🚀 ~ file: answer.action.ts:30 ~ createAnswer ~ newAnswer:',
-      newAnswer
-    )
     return { answer: newAnswer }
   } catch (error) {
     console.log('🚀 ~ file: answer.action.ts:12 ~ createAnswer ~ error:', error)
@@ -90,7 +82,6 @@ export const getAnswers = async (params: GetAnswersParams) => {
 }
 
 export async function upvoteAnswer(params: AnswerVoteParams) {
-  console.log('upvoteQuestion', params)
   try {
     connectToDatabase()
     const { answerId, userId, hasUpVoted, hasDownVoted, path } = params
@@ -108,8 +99,6 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
         $addToSet: { upvotes: userId }
       }
     }
-    console.log('🚀 ~ upvoteQuestion ~ updateQuery:', updateQuery)
-    console.log('🚀 ~ upvoteQuestion ~ answerId:', answerId)
     const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
       new: true
     })
@@ -140,7 +129,6 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
       }
     }
 
-    console.log('🚀 ~ upvoteQuestion ~ answerId:', answerId)
     const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
       new: true
     })

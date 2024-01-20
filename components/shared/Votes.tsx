@@ -45,7 +45,6 @@ const Votes = ({
     if (action === VoteActionType.UPVOTE) {
       if (type === VoteType.QUESTION) {
         await upvoteQuestion(params)
-        console.log('upvote question')
       } else if (type === VoteType.ANSWER) {
         await upvoteAnswer({
           answerId: JSON.parse(itemId),
@@ -59,7 +58,6 @@ const Votes = ({
     if (action === VoteActionType.DOWNVOTE) {
       if (type === VoteType.QUESTION) {
         await downvoteQuestion(params)
-        console.log('upvote question')
       } else if (type === VoteType.ANSWER) {
         await downvoteAnswer({
           answerId: JSON.parse(itemId),
@@ -82,7 +80,6 @@ const Votes = ({
 
   useEffect(() => {
     if (type === VoteType.QUESTION) {
-      console.log('viewQuestion')
       viewQuestion({
         questionId: JSON.parse(itemId),
         userId: userId ? JSON.parse(userId) : undefined

@@ -14,11 +14,9 @@ import React from 'react'
 
 const page = async ({ params: { id }, searchParams }: URLProps) => {
   const { userId: clerkId } = auth()
-  console.log('🚀 ~ page ~ clerkId:', clerkId)
   const { user, totalAnswers, totalQuestions } = await getUserInfo({
     userId: id
   })
-  console.log('🚀 ~ page ~ userinfo:', user)
   return (
     <>
       <div className="flex flex-col-reverse items-start justify-between sm:flex-row">
