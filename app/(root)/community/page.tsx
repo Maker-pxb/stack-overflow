@@ -7,6 +7,7 @@ import { getAllUsers } from '@/lib/actions/user.action'
 import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
 import React from 'react'
+import Loading from './loading'
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllUsers({
@@ -15,6 +16,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
     page: searchParams?.page ? Number(searchParams?.page) : 1,
     pageSize: 2
   })
+
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">All Users</h1>
