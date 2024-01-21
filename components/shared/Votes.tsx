@@ -8,6 +8,7 @@ import { VoteActionType, VoteType } from '@/types/enum'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
+import { toast } from '../ui/use-toast'
 
 interface Props {
   type: VoteType
@@ -33,7 +34,12 @@ const Votes = ({
   const router = useRouter()
 
   const handleVote = async (action: VoteActionType) => {
-    if (!userId) return
+    if (!userId) {
+      return toast({
+        title: 'Please log in',
+        description: 'You must be logged in to vote on this question'
+      })
+    }
     const params = {
       questionId: JSON.parse(itemId),
       userId: JSON.parse(userId),
@@ -54,6 +60,10 @@ const Votes = ({
           path: pathname
         })
       }
+      return toast({
+        title: `Upvote ${!hasUpVoted ? 'Successfully' : 'Removed'}`,
+        variant: !hasUpVoted ? 'default' : 'destructive'
+      })
     }
     if (action === VoteActionType.DOWNVOTE) {
       if (type === VoteType.QUESTION) {
@@ -67,6 +77,10 @@ const Votes = ({
           path: pathname
         })
       }
+      return toast({
+        title: `Downvote ${!hasDownVoted ? 'Successful' : 'Removed'}`,
+        variant: !hasDownVoted ? 'default' : 'destructive'
+      })
     }
   }
 
@@ -75,6 +89,12 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       userId: JSON.parse(userId),
       path: pathname
+    })
+    return toast({
+      title: `Question ${
+        !hasSaved ? 'Saved in' : 'Removed from'
+      } your collection`,
+      variant: !hasSaved ? 'default' : 'destructive'
     })
   }
 
