@@ -15,7 +15,7 @@ const RightSidebar = async () => {
           {hotQuestions.map((question) => {
             return (
               <Link
-                href={`/questions/${question._id}`}
+                href={`/question/${question._id}`}
                 key={question._id}
                 className="flex cursor-pointer items-center justify-between gap-7"
               >
