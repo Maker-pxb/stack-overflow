@@ -134,5 +134,7 @@ export async function POST(req: Request) {
       user: deletedUser
     })
   }
-  return new Response('', { status: 201 })
+  return Response.json({
+    message: 'OK'
+  })
 }
