@@ -78,27 +78,29 @@ const QuestionCard = ({
           isAuthor
           textStyles="text-dark400_light700 body-medium"
         />
-        <Metric
-          imgUrl="/assets/icons/like.svg"
-          alt="upvotes"
-          value={formatAndDivideNumber(upvotes?.length)}
-          title={' Votes'}
-          textStyles="text-dark400_light800 small-medium"
-        />
-        <Metric
-          imgUrl="/assets/icons/message.svg"
-          alt="message"
-          value={formatAndDivideNumber(answers?.length)}
-          title={' Answers'}
-          textStyles="text-dark400_light800 small-medium"
-        />
-        <Metric
-          imgUrl="/assets/icons/eye.svg"
-          alt="eye"
-          value={formatAndDivideNumber(views)}
-          title={' Views'}
-          textStyles="text-dark400_light800 small-medium"
-        />
+        <div className="flex items-center gap-3 max-sm:flex-wrap max-sm:justify-start">
+          <Metric
+            imgUrl="/assets/icons/like.svg"
+            alt="upvotes"
+            value={formatAndDivideNumber(upvotes?.length)}
+            title={' Votes'}
+            textStyles="text-dark400_light800 small-medium"
+          />
+          <Metric
+            imgUrl="/assets/icons/message.svg"
+            alt="message"
+            value={formatAndDivideNumber(answers?.length)}
+            title={' Answers'}
+            textStyles="text-dark400_light800 small-medium"
+          />
+          <Metric
+            imgUrl="/assets/icons/eye.svg"
+            alt="eye"
+            value={formatAndDivideNumber(views)}
+            title={' Views'}
+            textStyles="text-dark400_light800 small-medium"
+          />
+        </div>
       </div>
     </div>
   )

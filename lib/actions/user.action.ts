@@ -349,7 +349,7 @@ export async function getUserInfo(params: GetUserByIdParams) {
       },
       {
         type: 'TOTAL_VIEWS' as BadgeCriteriaType,
-        count: questionViews.totalViews || 0
+        count: questionViews?.totalViews || 0
       }
     ]
     console.log('🚀 ~ getUserInfo ~ criteria:', criteria)

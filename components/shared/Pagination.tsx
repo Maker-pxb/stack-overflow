@@ -69,7 +69,7 @@ const Pagination = ({
                 <p
                   className={`body-semibold ${
                     index + 1 === pageNumber ? 'text-light-900' : ''
-                  }`}
+                  } dark:text-light-900`}
                 >
                   {index + 1}
                 </p>

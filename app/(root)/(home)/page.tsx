@@ -5,23 +5,46 @@ import NoResult from '@/components/shared/NoResult'
 import Pagination from '@/components/shared/Pagination'
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar'
 import { Button } from '@/components/ui/button'
-import { HomePageFilters } from '@/constants/filters'
-import { getQuestions } from '@/lib/actions/question.action'
+import { HomeFilterEnum, HomePageFilters } from '@/constants/filters'
+import {
+  getQuestions,
+  getRecommendedQuestions
+} from '@/lib/actions/question.action'
 import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { auth } from '@clerk/nextjs'
 
 export const metadata: Metadata = {
   title: ' Home | Dev Overflow',
   description: 'Home page of Dev Overflow'
 }
 export default async function Home({ searchParams }: SearchParamsProps) {
-  const result = await getQuestions({
-    searchQuery: searchParams?.q,
-    filter: searchParams?.filter,
-    page: searchParams?.page ? Number(searchParams?.page) : 1,
-    pageSize: 5
-  })
+  const { userId } = auth()
+  let result
+  if (searchParams?.filter !== HomeFilterEnum.RECOMMENDED) {
+    result = await getQuestions({
+      searchQuery: searchParams?.q,
+      filter: searchParams?.filter,
+      page: searchParams?.page ? Number(searchParams?.page) : 1,
+      pageSize: 5
+    })
+  } else {
+    if (userId) {
+      result = await getRecommendedQuestions({
+        userId,
+        searchQuery: searchParams?.q,
+        page: searchParams?.page ? Number(searchParams?.page) : 1,
+        pageSize: 5
+      })
+    } else {
+      result = {
+        questions: [],
+        isNext: false,
+        total: 0
+      }
+    }
+  }
 
   const questions = result?.questions
 

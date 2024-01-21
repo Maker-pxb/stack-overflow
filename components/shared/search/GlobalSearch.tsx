@@ -65,7 +65,7 @@ const GlobalSearch = () => {
           className="cursor-pointer"
         />
         <Input
-          className="no-focus placeholder text-dark400_light700 paragraph-regular background-light800_darkgradient border-none shadow-none"
+          className="no-focus placeholder text-dark400_light700 paragraph-regular border-none bg-transparent shadow-none"
           type="text"
           placeholder="Search globally"
           value={search}
