@@ -63,9 +63,7 @@ const QuestionCard = ({
       </div>
       <div className="mt-3.5 flex flex-wrap gap-2">
         {tags?.map((tag) => (
-          <Link href={`/tag/${tag._id}`} key={tag._id}>
-            <RenderTag _id={tag._id} name={tag.name}></RenderTag>
-          </Link>
+          <RenderTag key={tag._id} _id={tag._id} name={tag.name}></RenderTag>
         ))}
       </div>
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
